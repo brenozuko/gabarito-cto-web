@@ -1,80 +1,38 @@
-import { eq } from "drizzle-orm";
+"use client";
+
 import { StatsPanel } from "~/components/stats/StatsPanel";
 import { XPDisplay } from "~/components/stats/XPDisplay";
 import { TrailCard } from "~/components/trails/TrailCard";
 import { ButtonLink } from "~/components/ui/button-link";
-import { db } from "~/server/db";
-import { items, trails } from "~/server/db/schema";
+import { useListTrails, useStats } from "~/hooks";
 
-async function getTrailsWithProgress() {
-  const allTrails = await db.select().from(trails);
-
-  const trailsWithProgress = await Promise.all(
-    allTrails.map(async (trail) => {
-      const trailItems = await db
-        .select()
-        .from(items)
-        .where(eq(items.trailId, trail.id));
-
-      const completedItems = trailItems.filter((item) => item.completed);
-      const progress =
-        trailItems.length > 0
-          ? (completedItems.length / trailItems.length) * 100
-          : 0;
-
-      return {
-        ...trail,
-        progress,
-        completedItems: completedItems.length,
-        totalItems: trailItems.length,
-      };
-    }),
-  );
-
-  return trailsWithProgress;
+interface TrailWithProgress {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: Date | number;
+  updatedAt: Date | number | null;
+  progress: number;
+  completedItems: number;
+  totalItems: number;
+  maxXp: number;
 }
 
-async function getStats() {
-  const allItems = await db.select().from(items);
-  const allTrails = await db.select().from(trails);
+export default function HomePage() {
+  const { data: trailsData = [], isLoading: trailsLoading } = useListTrails();
+  const { data: stats, isLoading: statsLoading } = useStats();
 
-  const totalXp = allItems
-    .filter((item) => item.completed)
-    .reduce((acc, item) => acc + item.xp, 0);
+  const isLoading = trailsLoading || statsLoading;
 
-  const trailStats = await Promise.all(
-    allTrails.map(async (trail) => {
-      const trailItems = await db
-        .select()
-        .from(items)
-        .where(eq(items.trailId, trail.id));
-
-      const completedItems = trailItems.filter((item) => item.completed);
-      const isComplete =
-        trailItems.length > 0 && completedItems.length === trailItems.length;
-
-      return {
-        trailId: trail.id,
-        isComplete,
-      };
-    }),
-  );
-
-  const completedTrails = trailStats.filter((stat) => stat.isComplete).length;
-  const completedItems = allItems.filter((item) => item.completed).length;
-
-  return {
-    totalXp,
-    totalTrails: allTrails.length,
-    completedTrails,
-    totalItems: allItems.length,
-    completedItems,
-  };
-}
-
-export default async function HomePage() {
-  const trailsData = await getTrailsWithProgress();
-  const stats = await getStats();
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">Carregando...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -87,12 +45,12 @@ export default async function HomePage() {
         </div>
 
         <div className="mb-8 grid gap-6 md:grid-cols-2">
-          <XPDisplay totalXp={stats.totalXp} />
+          <XPDisplay totalXp={stats?.totalXp ?? 0} />
           <StatsPanel
-            totalTrails={stats.totalTrails}
-            completedTrails={stats.completedTrails}
-            totalItems={stats.totalItems}
-            completedItems={stats.completedItems}
+            totalTrails={stats?.totalTrails ?? 0}
+            completedTrails={stats?.completedTrails ?? 0}
+            totalItems={stats?.totalItems ?? 0}
+            completedItems={stats?.completedItems ?? 0}
           />
         </div>
 
@@ -104,15 +62,16 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {trailsData.map((trail) => (
+            {trailsData.map((trail: TrailWithProgress) => (
               <TrailCard
                 key={trail.id}
                 id={trail.id}
                 name={trail.name}
                 description={trail.description}
-                progress={trail.progress}
-                completedItems={trail.completedItems}
-                totalItems={trail.totalItems}
+                progress={trail.progress ?? 0}
+                completedItems={trail.completedItems ?? 0}
+                totalItems={trail.totalItems ?? 0}
+                maxXp={trail.maxXp ?? 0}
               />
             ))}
           </div>

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { createTrailSchema } from "~/server/api/schemas";
 import { db } from "~/server/db";
@@ -6,7 +7,32 @@ import { items, trails } from "~/server/db/schema";
 export async function GET() {
   try {
     const allTrails = await db.select().from(trails);
-    return NextResponse.json(allTrails);
+
+    const trailsWithProgress = await Promise.all(
+      allTrails.map(async (trail) => {
+        const trailItems = await db
+          .select()
+          .from(items)
+          .where(eq(items.trailId, trail.id));
+
+        const completedItems = trailItems.filter((item) => item.completed);
+        const progress =
+          trailItems.length > 0
+            ? (completedItems.length / trailItems.length) * 100
+            : 0;
+        const maxXp = trailItems.reduce((acc, item) => acc + item.xp, 0);
+
+        return {
+          ...trail,
+          progress,
+          completedItems: completedItems.length,
+          totalItems: trailItems.length,
+          maxXp,
+        };
+      }),
+    );
+
+    return NextResponse.json(trailsWithProgress);
   } catch (error) {
     console.error("Error fetching trails:", error);
     return NextResponse.json(

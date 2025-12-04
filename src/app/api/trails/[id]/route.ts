@@ -2,7 +2,39 @@ import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { updateTrailSchema } from "~/server/api/schemas";
 import { db } from "~/server/db";
-import { trails } from "~/server/db/schema";
+import { items, trails } from "~/server/db/schema";
+
+async function getTrailWithProgress(trailId: number) {
+  const [trail] = await db
+    .select()
+    .from(trails)
+    .where(eq(trails.id, trailId))
+    .limit(1);
+
+  if (!trail) {
+    return null;
+  }
+
+  const trailItems = await db
+    .select()
+    .from(items)
+    .where(eq(items.trailId, trailId));
+
+  const completedItems = trailItems.filter((item) => item.completed);
+  const progress =
+    trailItems.length > 0
+      ? (completedItems.length / trailItems.length) * 100
+      : 0;
+  const maxXp = trailItems.reduce((acc, item) => acc + item.xp, 0);
+
+  return {
+    ...trail,
+    progress,
+    completedItems: completedItems.length,
+    totalItems: trailItems.length,
+    maxXp,
+  };
+}
 
 export async function GET(
   _request: NextRequest,
@@ -16,17 +48,13 @@ export async function GET(
       return NextResponse.json({ error: "ID de trilha inválido" }, { status: 400 });
     }
 
-    const [trail] = await db
-      .select()
-      .from(trails)
-      .where(eq(trails.id, trailId))
-      .limit(1);
+    const trailWithProgress = await getTrailWithProgress(trailId);
 
-    if (!trail) {
+    if (!trailWithProgress) {
       return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json(trail);
+    return NextResponse.json(trailWithProgress);
   } catch (error) {
     console.error("Error fetching trail:", error);
     return NextResponse.json(
@@ -65,7 +93,13 @@ export async function PUT(
       return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json(updatedTrail);
+    const trailWithProgress = await getTrailWithProgress(trailId);
+
+    if (!trailWithProgress) {
+      return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
+    }
+
+    return NextResponse.json(trailWithProgress);
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
