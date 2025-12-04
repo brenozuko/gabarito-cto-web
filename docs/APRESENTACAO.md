@@ -32,7 +32,8 @@
 
 ---
 
-## 🎯 O que é este projeto? {#o-que-é-este-projeto}
+<a id="o-que-é-este-projeto"></a>
+## 🎯 O que é este projeto?
 
 Temos uma aplicação web para gerenciar **trilhas de aprendizado** (learning paths). 
 
@@ -52,7 +53,8 @@ Temos uma aplicação web para gerenciar **trilhas de aprendizado** (learning pa
 
 ---
 
-## 🎨 O que é T3 Stack? {#o-que-é-t3-stack}
+<a id="o-que-é-t3-stack"></a>
+## 🎨 O que é T3 Stack?
 
 **T3 Stack** é um conjunto de tecnologias modernas e type-safe (TypeScript, Tailwind CSS, Next.js, Drizzle ORM, React Query, Zod, etc.) que trabalham juntas para criar aplicações web completas. O nome vem dos três "T's" principais: TypeScript, Tailwind e TRPC (ou APIs REST), mas na prática inclui muito mais ferramentas já integradas e configuradas.
 
@@ -60,9 +62,11 @@ O T3 Stack acelera o desenvolvimento porque elimina horas de configuração manu
 
 ---
 
-## 🛠️ Tecnologias Utilizadas {#tecnologias-utilizadas}
+<a id="tecnologias-utilizadas"></a>
+## 🛠️ Tecnologias Utilizadas
 
-### 1. **Next.js 15** (Framework React) {#1-nextjs-15-framework-react}
+<a id="1-nextjs-15-framework-react"></a>
+### 1. **Next.js 15** (Framework React)
 **O que é:** Framework para criar aplicações web modernas com React.
 
 **Por que usar:**
@@ -75,7 +79,8 @@ O T3 Stack acelera o desenvolvimento porque elimina horas de configuração manu
 
 ---
 
-### 2. **React 19** (Biblioteca JavaScript) {#2-react-19-biblioteca-javascript}
+<a id="2-react-19-biblioteca-javascript"></a>
+### 2. **React 19** (Biblioteca JavaScript)
 **O que é:** Biblioteca para criar interfaces de usuário (botões, formulários, páginas).
 
 **Conceito chave - Componentes:**
@@ -92,7 +97,8 @@ function Botao() {
 
 ---
 
-### 3. **TypeScript** (JavaScript com tipos) {#3-typescript-javascript-com-tipos}
+<a id="3-typescript-javascript-com-tipos"></a>
+### 3. **TypeScript** (JavaScript com tipos)
 **O que é:** JavaScript que adiciona "tipos" para evitar erros.
 
 **Por que usar:**
@@ -106,7 +112,8 @@ function Botao() {
 
 ---
 
-### 4. **Drizzle ORM** (Gerenciador de Banco de Dados) {#4-drizzle-orm-gerenciador-de-banco-de-dados}
+<a id="4-drizzle-orm-gerenciador-de-banco-de-dados"></a>
+### 4. **Drizzle ORM** (Gerenciador de Banco de Dados)
 **O que é:** Ferramenta que conecta o código ao banco de dados de forma segura e type-safe.
 
 **O que é ORM?**
@@ -207,7 +214,8 @@ const result = await db
 
 
 
-### 5. **SQLite** (Banco de Dados) {#5-sqlite-banco-de-dados}
+<a id="5-sqlite-banco-de-dados"></a>
+### 5. **SQLite** (Banco de Dados)
 **O que é:** Banco de dados leve que armazena dados em um arquivo.
 
 **Características:**
@@ -222,7 +230,8 @@ const result = await db
 
 ---
 
-### 6. **Tailwind CSS** (Framework de Estilização) {#6-tailwind-css-framework-de-estilização}
+<a id="6-tailwind-css-framework-de-estilização"></a>
+### 6. **Tailwind CSS** (Framework de Estilização)
 **O que é:** Framework CSS que usa classes para estilizar rapidamente.
 
 **Como funciona:**
@@ -239,7 +248,8 @@ const result = await db
 
 ---
 
-### 7. **React Query (TanStack Query)** (Gerenciamento de Dados) {#7-react-query-tanstack-query-gerenciamento-de-dados}
+<a id="7-react-query-tanstack-query-gerenciamento-de-dados"></a>
+### 7. **React Query (TanStack Query)** (Gerenciamento de Dados)
 **O que é:** Biblioteca para buscar e gerenciar dados da API.
 
 **O que faz:**
@@ -257,7 +267,8 @@ const { data, isLoading } = useListTrails();
 
 ---
 
-### 8. **Zod** (Validação de Dados) {#8-zod-validação-de-dados}
+<a id="8-zod-validação-de-dados"></a>
+### 8. **Zod** (Validação de Dados)
 **O que é:** Biblioteca para validar se os dados estão corretos.
 
 **Por que validar?**
@@ -274,7 +285,8 @@ const schema = z.object({
 
 ---
 
-## 🔑 Terminologias Essenciais {#terminologias-essenciais}
+<a id="terminologias-essenciais"></a>
+## 🔑 Terminologias Essenciais
 
 ### **Frontend vs Backend**
 - **Frontend:** O que o usuário vê (páginas, botões, formulários)
@@ -324,7 +336,8 @@ const schema = z.object({
 
 ---
 
-## 🔄 Como Funciona (Fluxo Básico) {#como-funciona-fluxo-básico}
+<a id="como-funciona-fluxo-básico"></a>
+## 🔄 Como Funciona (Fluxo Básico)
 
 ### 1. **Usuário acessa a página inicial**
 ```
@@ -348,7 +361,8 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 🎓 Conceitos Importantes para Iniciantes {#conceitos-importantes-para-iniciantes}
+<a id="conceitos-importantes-para-iniciantes"></a>
+## 🎓 Conceitos Importantes para Iniciantes
 
 ### **Client vs Server Components (Next.js)**
 - **Server Component (padrão):**
@@ -374,7 +388,8 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 📊 Exemplo Prático: Criar uma Trilha {#exemplo-prático-criar-uma-trilha}
+<a id="exemplo-prático-criar-uma-trilha"></a>
+## 📊 Exemplo Prático: Criar uma Trilha
 
 1. **Usuário preenche formulário** (Frontend)
 2. **Zod valida os dados** (Validação)
@@ -385,7 +400,8 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 🚀 Comandos Principais {#comandos-principais}
+<a id="comandos-principais"></a>
+## 🚀 Comandos Principais
 
 ```bash
 # Instalar dependências
@@ -407,7 +423,8 @@ pnpm format:write
 ---
 
 
-## 📚 Recursos para Aprender Mais {#recursos-para-aprender-mais}
+<a id="recursos-para-aprender-mais"></a>
+## 📚 Recursos para Aprender Mais
 
 - [Next.js Docs](https://nextjs.org/docs) - Documentação oficial
 - [React Docs](https://react.dev) - Documentação do React
