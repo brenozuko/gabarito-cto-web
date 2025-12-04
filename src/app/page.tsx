@@ -1,36 +1,127 @@
+import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { StatsPanel } from "~/components/stats/StatsPanel";
+import { XPDisplay } from "~/components/stats/XPDisplay";
+import { TrailCard } from "~/components/trails/TrailCard";
+import { db } from "~/server/db";
+import { items, trails } from "~/server/db/schema";
 
-export default function HomePage() {
+async function getTrailsWithProgress() {
+  const allTrails = await db.select().from(trails);
+
+  const trailsWithProgress = await Promise.all(
+    allTrails.map(async (trail) => {
+      const trailItems = await db
+        .select()
+        .from(items)
+        .where(eq(items.trailId, trail.id));
+
+      const completedItems = trailItems.filter((item) => item.completed);
+      const progress =
+        trailItems.length > 0
+          ? (completedItems.length / trailItems.length) * 100
+          : 0;
+
+      return {
+        ...trail,
+        progress,
+        completedItems: completedItems.length,
+        totalItems: trailItems.length,
+      };
+    }),
+  );
+
+  return trailsWithProgress;
+}
+
+async function getStats() {
+  const allItems = await db.select().from(items);
+  const allTrails = await db.select().from(trails);
+
+  const totalXp = allItems
+    .filter((item) => item.completed)
+    .reduce((acc, item) => acc + item.xp, 0);
+
+  const trailStats = await Promise.all(
+    allTrails.map(async (trail) => {
+      const trailItems = await db
+        .select()
+        .from(items)
+        .where(eq(items.trailId, trail.id));
+
+      const completedItems = trailItems.filter((item) => item.completed);
+      const isComplete =
+        trailItems.length > 0 && completedItems.length === trailItems.length;
+
+      return {
+        trailId: trail.id,
+        isComplete,
+      };
+    }),
+  );
+
+  const completedTrails = trailStats.filter((stat) => stat.isComplete).length;
+  const completedItems = allItems.filter((item) => item.completed).length;
+
+  return {
+    totalXp,
+    totalTrails: allTrails.length,
+    completedTrails,
+    totalItems: allItems.length,
+    completedItems,
+  };
+}
+
+export default async function HomePage() {
+  const trailsData = await getTrailsWithProgress();
+  const stats = await getStats();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-gray-900">
+            Learning Trails
+          </h1>
           <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
+            href="/trails/new"
+            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
+            New Trail
           </Link>
         </div>
+
+        <div className="mb-8 grid gap-6 md:grid-cols-2">
+          <XPDisplay totalXp={stats.totalXp} />
+          <StatsPanel
+            totalTrails={stats.totalTrails}
+            completedTrails={stats.completedTrails}
+            totalItems={stats.totalItems}
+            completedItems={stats.completedItems}
+          />
+        </div>
+
+        {trailsData.length === 0 ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
+            <p className="text-lg text-gray-600">
+              No trails yet. Create your first trail to get started!
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {trailsData.map((trail) => (
+              <TrailCard
+                key={trail.id}
+                id={trail.id}
+                name={trail.name}
+                description={trail.description}
+                progress={trail.progress}
+                completedItems={trail.completedItems}
+                totalItems={trail.totalItems}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
