@@ -2,9 +2,9 @@
 
 ## 📑 Índice
 
-1. [🎯 O que é este projeto?](#-o-que-é-este-projeto)
-2. [🎨 O que é T3 Stack?](#-o-que-é-t3-stack)
-3. [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
+1. [🎯 O que é este projeto?](#o-que-é-este-projeto)
+2. [🎨 O que é T3 Stack?](#o-que-é-t3-stack)
+3. [🛠️ Tecnologias Utilizadas](#tecnologias-utilizadas)
    - [Next.js 15](#1-nextjs-15-framework-react)
    - [React 19](#2-react-19-biblioteca-javascript)
    - [TypeScript](#3-typescript-javascript-com-tipos)
@@ -13,14 +13,12 @@
    - [Tailwind CSS](#6-tailwind-css-framework-de-estilização)
    - [React Query](#7-react-query-tanstack-query-gerenciamento-de-dados)
    - [Zod](#8-zod-validação-de-dados)
-4. [🔑 Terminologias Essenciais](#-terminologias-essenciais)
-5. [🔄 Como Funciona (Fluxo Básico)](#-como-funciona-fluxo-básico)
-6. [🎓 Conceitos Importantes para Iniciantes](#-conceitos-importantes-para-iniciantes)
-7. [📊 Exemplo Prático: Criar uma Trilha](#-exemplo-prático-criar-uma-trilha)
-8. [🚀 Comandos Principais](#-comandos-principais)
-9. [💡 Dicas para Iniciantes](#-dicas-para-iniciantes)
-10. [🎯 Desafios para Evoluir o Projeto](#-desafios-para-evoluir-o-projeto)
-11. [📚 Recursos para Aprender Mais](#-recursos-para-aprender-mais)
+4. [🔑 Terminologias Essenciais](#terminologias-essenciais)
+5. [🔄 Como Funciona (Fluxo Básico)](#como-funciona-fluxo-básico)
+6. [🎓 Conceitos Importantes para Iniciantes](#conceitos-importantes-para-iniciantes)
+7. [📊 Exemplo Prático: Criar uma Trilha](#exemplo-prático-criar-uma-trilha)
+8. [🚀 Comandos Principais](#comandos-principais)
+9. [📚 Recursos para Aprender Mais](#recursos-para-aprender-mais)
 
 ---
 
@@ -34,7 +32,7 @@
 
 ---
 
-## 🎯 O que é este projeto?
+## 🎯 O que é este projeto? {#o-que-é-este-projeto}
 
 Temos uma aplicação web para gerenciar **trilhas de aprendizado** (learning paths). 
 
@@ -54,7 +52,7 @@ Temos uma aplicação web para gerenciar **trilhas de aprendizado** (learning pa
 
 ---
 
-## 🎨 O que é T3 Stack?
+## 🎨 O que é T3 Stack? {#o-que-é-t3-stack}
 
 **T3 Stack** é um conjunto de tecnologias modernas e type-safe (TypeScript, Tailwind CSS, Next.js, Drizzle ORM, React Query, Zod, etc.) que trabalham juntas para criar aplicações web completas. O nome vem dos três "T's" principais: TypeScript, Tailwind e TRPC (ou APIs REST), mas na prática inclui muito mais ferramentas já integradas e configuradas.
 
@@ -62,9 +60,9 @@ O T3 Stack acelera o desenvolvimento porque elimina horas de configuração manu
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas {#tecnologias-utilizadas}
 
-### 1. **Next.js 15** (Framework React)
+### 1. **Next.js 15** (Framework React) {#1-nextjs-15-framework-react}
 **O que é:** Framework para criar aplicações web modernas com React.
 
 **Por que usar:**
@@ -77,7 +75,7 @@ O T3 Stack acelera o desenvolvimento porque elimina horas de configuração manu
 
 ---
 
-### 2. **React 19** (Biblioteca JavaScript)
+### 2. **React 19** (Biblioteca JavaScript) {#2-react-19-biblioteca-javascript}
 **O que é:** Biblioteca para criar interfaces de usuário (botões, formulários, páginas).
 
 **Conceito chave - Componentes:**
@@ -94,7 +92,7 @@ function Botao() {
 
 ---
 
-### 3. **TypeScript** (JavaScript com tipos)
+### 3. **TypeScript** (JavaScript com tipos) {#3-typescript-javascript-com-tipos}
 **O que é:** JavaScript que adiciona "tipos" para evitar erros.
 
 **Por que usar:**
@@ -108,7 +106,7 @@ function Botao() {
 
 ---
 
-### 4. **Drizzle ORM** (Gerenciador de Banco de Dados)
+### 4. **Drizzle ORM** (Gerenciador de Banco de Dados) {#4-drizzle-orm-gerenciador-de-banco-de-dados}
 **O que é:** Ferramenta que conecta o código ao banco de dados de forma segura e type-safe.
 
 **O que é ORM?**
@@ -209,7 +207,7 @@ const result = await db
 
 
 
-### 5. **SQLite** (Banco de Dados)
+### 5. **SQLite** (Banco de Dados) {#5-sqlite-banco-de-dados}
 **O que é:** Banco de dados leve que armazena dados em um arquivo.
 
 **Características:**
@@ -224,7 +222,7 @@ const result = await db
 
 ---
 
-### 6. **Tailwind CSS** (Framework de Estilização)
+### 6. **Tailwind CSS** (Framework de Estilização) {#6-tailwind-css-framework-de-estilização}
 **O que é:** Framework CSS que usa classes para estilizar rapidamente.
 
 **Como funciona:**
@@ -241,7 +239,7 @@ const result = await db
 
 ---
 
-### 7. **React Query (TanStack Query)** (Gerenciamento de Dados)
+### 7. **React Query (TanStack Query)** (Gerenciamento de Dados) {#7-react-query-tanstack-query-gerenciamento-de-dados}
 **O que é:** Biblioteca para buscar e gerenciar dados da API.
 
 **O que faz:**
@@ -259,7 +257,7 @@ const { data, isLoading } = useListTrails();
 
 ---
 
-### 8. **Zod** (Validação de Dados)
+### 8. **Zod** (Validação de Dados) {#8-zod-validação-de-dados}
 **O que é:** Biblioteca para validar se os dados estão corretos.
 
 **Por que validar?**
@@ -276,7 +274,7 @@ const schema = z.object({
 
 ---
 
-## 🔑 Terminologias Essenciais
+## 🔑 Terminologias Essenciais {#terminologias-essenciais}
 
 ### **Frontend vs Backend**
 - **Frontend:** O que o usuário vê (páginas, botões, formulários)
@@ -326,7 +324,7 @@ const schema = z.object({
 
 ---
 
-## 🔄 Como Funciona (Fluxo Básico)
+## 🔄 Como Funciona (Fluxo Básico) {#como-funciona-fluxo-básico}
 
 ### 1. **Usuário acessa a página inicial**
 ```
@@ -350,7 +348,7 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 🎓 Conceitos Importantes para Iniciantes
+## 🎓 Conceitos Importantes para Iniciantes {#conceitos-importantes-para-iniciantes}
 
 ### **Client vs Server Components (Next.js)**
 - **Server Component (padrão):**
@@ -376,7 +374,7 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 📊 Exemplo Prático: Criar uma Trilha
+## 📊 Exemplo Prático: Criar uma Trilha {#exemplo-prático-criar-uma-trilha}
 
 1. **Usuário preenche formulário** (Frontend)
 2. **Zod valida os dados** (Validação)
@@ -387,7 +385,7 @@ Formulário → Validação (Zod) → API → Banco de Dados → Atualiza tela
 
 ---
 
-## 🚀 Comandos Principais
+## 🚀 Comandos Principais {#comandos-principais}
 
 ```bash
 # Instalar dependências
@@ -409,7 +407,7 @@ pnpm format:write
 ---
 
 
-## 📚 Recursos para Aprender Mais
+## 📚 Recursos para Aprender Mais {#recursos-para-aprender-mais}
 
 - [Next.js Docs](https://nextjs.org/docs) - Documentação oficial
 - [React Docs](https://react.dev) - Documentação do React
