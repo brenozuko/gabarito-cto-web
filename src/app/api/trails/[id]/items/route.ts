@@ -12,7 +12,7 @@ export async function GET(
     const trailId = Number.parseInt(id, 10);
 
     if (Number.isNaN(trailId)) {
-      return NextResponse.json({ error: "Invalid trail ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de trilha inválido" }, { status: 400 });
     }
 
     const trailItems = await db
@@ -25,7 +25,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching trail items:", error);
     return NextResponse.json(
-      { error: "Failed to fetch trail items" },
+      { error: "Falha ao buscar itens da trilha" },
       { status: 500 },
     );
   }

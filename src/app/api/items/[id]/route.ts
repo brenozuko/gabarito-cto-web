@@ -13,7 +13,7 @@ export async function PUT(
     const itemId = Number.parseInt(id, 10);
 
     if (Number.isNaN(itemId)) {
-      return NextResponse.json({ error: "Invalid item ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de item inválido" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -49,20 +49,20 @@ export async function PUT(
       .returning();
 
     if (!updatedItem) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
     }
 
     return NextResponse.json(updatedItem);
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
-        { error: "Invalid input data", details: error },
+        { error: "Dados de entrada inválidos", details: error },
         { status: 400 },
       );
     }
     console.error("Error updating item:", error);
     return NextResponse.json(
-      { error: "Failed to update item" },
+      { error: "Falha ao atualizar item" },
       { status: 500 },
     );
   }
@@ -77,7 +77,7 @@ export async function DELETE(
     const itemId = Number.parseInt(id, 10);
 
     if (Number.isNaN(itemId)) {
-      return NextResponse.json({ error: "Invalid item ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de item inválido" }, { status: 400 });
     }
 
     const [deletedItem] = await db
@@ -86,14 +86,14 @@ export async function DELETE(
       .returning();
 
     if (!deletedItem) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Item deleted successfully" });
+    return NextResponse.json({ message: "Item excluído com sucesso" });
   } catch (error) {
     console.error("Error deleting item:", error);
     return NextResponse.json(
-      { error: "Failed to delete item" },
+      { error: "Falha ao excluir item" },
       { status: 500 },
     );
   }

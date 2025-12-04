@@ -1,9 +1,30 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 import { useCreateItem, useUpdateItem } from "~/hooks";
+
+const itemFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório").max(256, "Nome deve ter no máximo 256 caracteres"),
+  description: z.string().max(1000, "Descrição deve ter no máximo 1000 caracteres").optional().or(z.literal("")),
+  xp: z.coerce.number().int().positive("XP deve ser um número positivo").min(1, "XP deve ser pelo menos 1"),
+  order: z.coerce.number().int().nonnegative("Ordem deve ser um número não negativo"),
+});
+
+type ItemFormData = z.infer<typeof itemFormSchema>;
 
 interface ItemFormProps {
   trailId: number;
@@ -27,34 +48,35 @@ export function ItemForm({
   const router = useRouter();
   const createItem = useCreateItem();
   const updateItem = useUpdateItem();
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [description, setDescription] = useState(initialData?.description ?? "");
-  const [xp, setXp] = useState(initialData?.xp ?? 10);
-  const [order, setOrder] = useState(initialData?.order ?? 0);
 
-  const isSubmitting = createItem.isPending || updateItem.isPending;
+  const form = useForm<ItemFormData>({
+    resolver: zodResolver(itemFormSchema),
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+      xp: initialData?.xp ?? 10,
+      order: initialData?.order ?? 0,
+    },
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-
+  const onSubmit = async (data: ItemFormData) => {
     try {
       if (mode === "create") {
         await createItem.mutateAsync({
           trailId,
-          name,
-          description: description || undefined,
-          xp,
-          order,
+          name: data.name,
+          description: data.description || undefined,
+          xp: data.xp,
+          order: data.order,
         });
       } else if (initialData) {
         await updateItem.mutateAsync({
           id: initialData.id,
           data: {
-            name,
-            description: description || undefined,
-            xp,
-            order,
+            name: data.name,
+            description: data.description || undefined,
+            xp: data.xp,
+            order: data.order,
           },
         });
       }
@@ -64,113 +86,107 @@ export function ItemForm({
       }
     } catch (error) {
       console.error("Error saving item:", error);
-      alert("Failed to save item. Please try again.");
+      alert("Falha ao salvar item. Por favor, tente novamente.");
     }
   };
 
+  const isFormSubmitting = form.formState.isSubmitting || createItem.isPending || updateItem.isPending;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Name *
-        </label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          maxLength={256}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-          disabled={isSubmitting}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome *</FormLabel>
+              <FormControl>
+                <Input {...field} maxLength={256} disabled={isFormSubmitting} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Description
-        </label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-          disabled={isSubmitting}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea {...field} rows={4} disabled={isFormSubmitting} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="xp"
-            className="block text-sm font-medium text-gray-700"
-          >
-            XP *
-          </label>
-          <input
-            type="number"
-            id="xp"
-            value={xp}
-            onChange={(e) => setXp(Number.parseInt(e.target.value, 10) || 0)}
-            required
-            min={1}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-            disabled={isSubmitting}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="xp"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>XP *</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10) || 0)}
+                    value={field.value}
+                    min={1}
+                    disabled={isFormSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="order"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ordem</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10) || 0)}
+                    value={field.value}
+                    min={0}
+                    disabled={isFormSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="order"
-            className="block text-sm font-medium text-gray-700"
+        <div className="flex gap-4">
+          <Button type="submit" disabled={isFormSubmitting}>
+            {isFormSubmitting ? "Salvando..." : mode === "create" ? "Criar" : "Salvar"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (onSuccess) {
+                onSuccess();
+              } else {
+                router.back();
+              }
+            }}
+            disabled={isFormSubmitting}
           >
-            Order
-          </label>
-          <input
-            type="number"
-            id="order"
-            value={order}
-            onChange={(e) =>
-              setOrder(Number.parseInt(e.target.value, 10) || 0)
-            }
-            min={0}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-            disabled={isSubmitting}
-          />
+            Cancelar
+          </Button>
         </div>
-      </div>
-
-      <div className="flex gap-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isSubmitting ? "Saving..." : mode === "create" ? "Create" : "Save"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            if (onSuccess) {
-              onSuccess();
-            } else {
-              router.back();
-            }
-          }}
-          disabled={isSubmitting}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }
-

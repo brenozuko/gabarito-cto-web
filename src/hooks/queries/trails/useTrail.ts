@@ -11,7 +11,7 @@ export function useTrail(id: number) {
     queryKey: trailKeys.detail(id),
     queryFn: async () => {
       const res = await fetch(`/api/trails/${id}`);
-      if (!res.ok) throw new Error("Failed to fetch trail");
+      if (!res.ok) throw new Error("Falha ao buscar trilha");
       return res.json();
     },
     enabled: !!id,

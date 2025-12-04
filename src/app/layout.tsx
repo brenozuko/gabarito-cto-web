@@ -5,8 +5,8 @@ import { Geist } from "next/font/google";
 import { Providers } from "~/lib/providers";
 
 export const metadata: Metadata = {
-  title: "Gamified Learning Trails",
-  description: "Educational system to facilitate programming learning through gamified trails",
+  title: "Trilhas de Aprendizado Gamificadas",
+  description: "Sistema educacional para facilitar o aprendizado de programação através de trilhas gamificadas",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -19,8 +19,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
-      <body>
+    <html lang="pt-BR" className={`${geist.variable}`} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

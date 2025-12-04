@@ -20,7 +20,7 @@ export function useCreateTrail() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to create trail");
+      if (!res.ok) throw new Error("Falha ao criar trilha");
       return res.json();
     },
     onSuccess: async () => {

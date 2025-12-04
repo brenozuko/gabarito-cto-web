@@ -1,8 +1,28 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 import { useCreateTrail, useUpdateTrail } from "~/hooks";
+
+const trailFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório").max(256, "Nome deve ter no máximo 256 caracteres"),
+  description: z.string().max(1000, "Descrição deve ter no máximo 1000 caracteres").optional().or(z.literal("")),
+});
+
+type TrailFormData = z.infer<typeof trailFormSchema>;
 
 interface TrailFormProps {
   initialData?: {
@@ -17,93 +37,86 @@ export function TrailForm({ initialData, mode }: TrailFormProps) {
   const router = useRouter();
   const createTrail = useCreateTrail();
   const updateTrail = useUpdateTrail();
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [description, setDescription] = useState(initialData?.description ?? "");
 
-  const isSubmitting = createTrail.isPending || updateTrail.isPending;
+  const form = useForm<TrailFormData>({
+    resolver: zodResolver(trailFormSchema),
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+    },
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-
+  const onSubmit = async (data: TrailFormData) => {
     try {
       if (mode === "create") {
         await createTrail.mutateAsync({
-          name,
-          description: description || undefined,
+          name: data.name,
+          description: data.description || undefined,
         });
       } else if (initialData) {
         await updateTrail.mutateAsync({
           id: initialData.id,
           data: {
-            name,
-            description: description || undefined,
+            name: data.name,
+            description: data.description || undefined,
           },
         });
       }
       router.push("/");
     } catch (error) {
       console.error("Error saving trail:", error);
-      alert("Failed to save trail. Please try again.");
+      alert("Falha ao salvar trilha. Por favor, tente novamente.");
     }
   };
 
+  const isFormSubmitting = form.formState.isSubmitting || createTrail.isPending || updateTrail.isPending;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Name *
-        </label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          maxLength={256}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-          disabled={isSubmitting}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome *</FormLabel>
+              <FormControl>
+                <Input {...field} maxLength={256} disabled={isFormSubmitting} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Description
-        </label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-          disabled={isSubmitting}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea {...field} rows={4} disabled={isFormSubmitting} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="flex gap-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isSubmitting ? "Saving..." : mode === "create" ? "Create" : "Save"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+        <div className="flex gap-4">
+          <Button type="submit" disabled={isFormSubmitting}>
+            {isFormSubmitting ? "Salvando..." : mode === "create" ? "Criar" : "Salvar"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={isFormSubmitting}
+          >
+            Cancelar
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
 

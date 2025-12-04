@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import Link from "next/link";
 import { StatsPanel } from "~/components/stats/StatsPanel";
 import { XPDisplay } from "~/components/stats/XPDisplay";
 import { TrailCard } from "~/components/trails/TrailCard";
+import { ButtonLink } from "~/components/ui/button-link";
 import { db } from "~/server/db";
 import { items, trails } from "~/server/db/schema";
 
@@ -77,18 +77,13 @@ export default async function HomePage() {
   const stats = await getStats();
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-4xl font-bold text-gray-900">
-            Learning Trails
+          <h1 className="text-4xl font-bold text-foreground">
+            Trilhas de Aprendizado
           </h1>
-          <Link
-            href="/trails/new"
-            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          >
-            New Trail
-          </Link>
+          <ButtonLink href="/trails/new">Nova Trilha</ButtonLink>
         </div>
 
         <div className="mb-8 grid gap-6 md:grid-cols-2">
@@ -102,9 +97,9 @@ export default async function HomePage() {
         </div>
 
         {trailsData.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-            <p className="text-lg text-gray-600">
-              No trails yet. Create your first trail to get started!
+          <div className="rounded-lg border border-border bg-card p-12 text-center">
+            <p className="text-lg text-muted-foreground">
+              Ainda não há trilhas. Crie sua primeira trilha para começar!
             </p>
           </div>
         ) : (

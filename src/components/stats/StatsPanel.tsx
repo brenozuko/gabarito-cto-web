@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { cn } from "~/lib/utils";
+
 interface StatsPanelProps {
   totalTrails: number;
   completedTrails: number;
@@ -13,7 +21,7 @@ export function StatsPanel({
   completedTrails,
   totalItems,
   completedItems,
-  className = "",
+  className,
 }: StatsPanelProps) {
   const trailsProgress =
     totalTrails > 0 ? (completedTrails / totalTrails) * 100 : 0;
@@ -21,39 +29,43 @@ export function StatsPanel({
     totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
   return (
-    <div className={`rounded-lg border border-gray-200 bg-white p-6 shadow-sm ${className}`}>
-      <h2 className="mb-4 text-xl font-bold text-gray-900">Statistics</h2>
-      <div className="space-y-4">
-        <div>
-          <div className="mb-1 flex justify-between text-sm">
-            <span className="text-gray-600">Trails Completed</span>
-            <span className="font-semibold text-gray-900">
-              {completedTrails} / {totalTrails}
-            </span>
+    <Card className={cn(className)}>
+      <CardHeader>
+        <CardTitle>Estatísticas</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="text-muted-foreground">Trilhas Concluídas</span>
+              <span className="font-semibold">
+                {completedTrails} / {totalTrails}
+              </span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full bg-success transition-all duration-300"
+                style={{ width: `${trailsProgress}%` }}
+              />
+            </div>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
-            <div
-              className="h-full bg-green-500 transition-all duration-300"
-              style={{ width: `${trailsProgress}%` }}
-            />
+          <div>
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="text-muted-foreground">Itens Concluídos</span>
+              <span className="font-semibold">
+                {completedItems} / {totalItems}
+              </span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{ width: `${itemsProgress}%` }}
+              />
+            </div>
           </div>
         </div>
-        <div>
-          <div className="mb-1 flex justify-between text-sm">
-            <span className="text-gray-600">Items Completed</span>
-            <span className="font-semibold text-gray-900">
-              {completedItems} / {totalItems}
-            </span>
-          </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
-            <div
-              className="h-full bg-blue-500 transition-all duration-300"
-              style={{ width: `${itemsProgress}%` }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

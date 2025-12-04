@@ -17,7 +17,7 @@ export function useDeleteItem() {
       const res = await fetch(`/api/items/${id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Failed to delete item");
+      if (!res.ok) throw new Error("Falha ao excluir item");
       return res.json();
     },
     onSuccess: async () => {

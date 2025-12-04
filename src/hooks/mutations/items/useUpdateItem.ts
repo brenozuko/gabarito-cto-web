@@ -26,7 +26,7 @@ export function useUpdateItem() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to update item");
+      if (!res.ok) throw new Error("Falha ao atualizar item");
       return res.json();
     },
     onSuccess: async (item) => {

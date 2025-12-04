@@ -1,9 +1,10 @@
-import { notFound } from "next/navigation";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ItemForm } from "~/components/forms/ItemForm";
+import { Card, CardContent } from "~/components/ui/card";
 import { db } from "~/server/db";
 import { trails } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
-import { ItemForm } from "~/components/forms/ItemForm";
 
 async function getTrail(id: number) {
   const [trail] = await db
@@ -33,30 +34,26 @@ export default async function NewItemPage({
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Link
             href={`/trails/${trail.id}`}
-            className="text-blue-600 hover:text-blue-800 hover:underline"
+            className="text-primary hover:text-primary/80 hover:underline"
           >
-            ← Back to Trail
+            ← Voltar para Trilha
           </Link>
         </div>
 
         <div className="mx-auto max-w-2xl">
-          <h1 className="mb-8 text-3xl font-bold text-gray-900">
-            Add New Item to "{trail.name}"
+          <h1 className="mb-8 text-3xl font-bold text-foreground">
+            Adicionar Novo Item a "{trail.name}"
           </h1>
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <ItemForm
-              mode="create"
-              trailId={trail.id}
-              onSuccess={() => {
-                // This will be handled client-side via router.push
-              }}
-            />
-          </div>
+          <Card>
+            <CardContent className="p-6">
+              <ItemForm mode="create" trailId={trail.id} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </main>

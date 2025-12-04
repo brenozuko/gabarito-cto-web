@@ -65,7 +65,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching stats:", error);
     return NextResponse.json(
-      { error: "Failed to fetch statistics" },
+      { error: "Falha ao buscar estatísticas" },
       { status: 500 },
     );
   }

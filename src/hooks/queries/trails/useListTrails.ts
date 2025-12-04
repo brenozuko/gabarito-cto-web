@@ -11,7 +11,7 @@ export function useListTrails() {
     queryKey: trailKeys.list,
     queryFn: async () => {
       const res = await fetch("/api/trails");
-      if (!res.ok) throw new Error("Failed to fetch trails");
+      if (!res.ok) throw new Error("Falha ao buscar trilhas");
       return res.json();
     },
   });

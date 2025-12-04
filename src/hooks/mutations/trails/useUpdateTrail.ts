@@ -27,7 +27,7 @@ export function useUpdateTrail() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to update trail");
+      if (!res.ok) throw new Error("Falha ao atualizar trilha");
       return res.json();
     },
     onSuccess: async (_, variables) => {

@@ -17,7 +17,7 @@ export function useCompleteItem() {
       const res = await fetch(`/api/items/${id}/complete`, {
         method: "PATCH",
       });
-      if (!res.ok) throw new Error("Failed to update item completion");
+      if (!res.ok) throw new Error("Falha ao atualizar conclusão do item");
       return res.json();
     },
     onSuccess: async (item) => {

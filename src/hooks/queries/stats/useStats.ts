@@ -11,7 +11,7 @@ export function useStats() {
     queryKey: statsKeys.all,
     queryFn: async () => {
       const res = await fetch("/api/stats");
-      if (!res.ok) throw new Error("Failed to fetch stats");
+      if (!res.ok) throw new Error("Falha ao buscar estatísticas");
       return res.json();
     },
   });

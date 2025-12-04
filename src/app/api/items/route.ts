@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
-        { error: "Invalid input data", details: error },
+        { error: "Dados de entrada inválidos", details: error },
         { status: 400 },
       );
     }
     console.error("Error creating item:", error);
     return NextResponse.json(
-      { error: "Failed to create item" },
+      { error: "Falha ao criar item" },
       { status: 500 },
     );
   }

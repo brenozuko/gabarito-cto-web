@@ -17,7 +17,7 @@ export function useDeleteTrail() {
       const res = await fetch(`/api/trails/${id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Failed to delete trail");
+      if (!res.ok) throw new Error("Falha ao excluir trilha");
       return res.json();
     },
     onSuccess: async () => {

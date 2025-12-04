@@ -20,7 +20,7 @@ export function useCreateItem() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to create item");
+      if (!res.ok) throw new Error("Falha ao criar item");
       return res.json();
     },
     onSuccess: async (_, variables) => {

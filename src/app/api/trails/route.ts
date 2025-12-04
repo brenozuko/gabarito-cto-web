@@ -10,7 +10,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching trails:", error);
     return NextResponse.json(
-      { error: "Failed to fetch trails" },
+      { error: "Falha ao buscar trilhas" },
       { status: 500 },
     );
   }
@@ -33,13 +33,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
-        { error: "Invalid input data", details: error },
+        { error: "Dados de entrada inválidos", details: error },
         { status: 400 },
       );
     }
     console.error("Error creating trail:", error);
     return NextResponse.json(
-      { error: "Failed to create trail" },
+      { error: "Falha ao criar trilha" },
       { status: 500 },
     );
   }

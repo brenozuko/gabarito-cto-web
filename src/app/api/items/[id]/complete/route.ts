@@ -12,7 +12,7 @@ export async function PATCH(
     const itemId = Number.parseInt(id, 10);
 
     if (Number.isNaN(itemId)) {
-      return NextResponse.json({ error: "Invalid item ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de item inválido" }, { status: 400 });
     }
 
     const [item] = await db
@@ -22,7 +22,7 @@ export async function PATCH(
       .limit(1);
 
     if (!item) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
     }
 
     // Toggle completion status
@@ -39,7 +39,7 @@ export async function PATCH(
   } catch (error) {
     console.error("Error updating item completion:", error);
     return NextResponse.json(
-      { error: "Failed to update item completion" },
+      { error: "Falha ao atualizar conclusão do item" },
       { status: 500 },
     );
   }

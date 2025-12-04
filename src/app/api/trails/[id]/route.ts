@@ -13,7 +13,7 @@ export async function GET(
     const trailId = Number.parseInt(id, 10);
 
     if (Number.isNaN(trailId)) {
-      return NextResponse.json({ error: "Invalid trail ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de trilha inválido" }, { status: 400 });
     }
 
     const [trail] = await db
@@ -23,14 +23,14 @@ export async function GET(
       .limit(1);
 
     if (!trail) {
-      return NextResponse.json({ error: "Trail not found" }, { status: 404 });
+      return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
     }
 
     return NextResponse.json(trail);
   } catch (error) {
     console.error("Error fetching trail:", error);
     return NextResponse.json(
-      { error: "Failed to fetch trail" },
+      { error: "Falha ao buscar trilha" },
       { status: 500 },
     );
   }
@@ -45,7 +45,7 @@ export async function PUT(
     const trailId = Number.parseInt(id, 10);
 
     if (Number.isNaN(trailId)) {
-      return NextResponse.json({ error: "Invalid trail ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de trilha inválido" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -62,20 +62,20 @@ export async function PUT(
       .returning();
 
     if (!updatedTrail) {
-      return NextResponse.json({ error: "Trail not found" }, { status: 404 });
+      return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
     }
 
     return NextResponse.json(updatedTrail);
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
-        { error: "Invalid input data", details: error },
+        { error: "Dados de entrada inválidos", details: error },
         { status: 400 },
       );
     }
     console.error("Error updating trail:", error);
     return NextResponse.json(
-      { error: "Failed to update trail" },
+      { error: "Falha ao atualizar trilha" },
       { status: 500 },
     );
   }
@@ -90,7 +90,7 @@ export async function DELETE(
     const trailId = Number.parseInt(id, 10);
 
     if (Number.isNaN(trailId)) {
-      return NextResponse.json({ error: "Invalid trail ID" }, { status: 400 });
+      return NextResponse.json({ error: "ID de trilha inválido" }, { status: 400 });
     }
 
     const [deletedTrail] = await db
@@ -99,14 +99,14 @@ export async function DELETE(
       .returning();
 
     if (!deletedTrail) {
-      return NextResponse.json({ error: "Trail not found" }, { status: 404 });
+      return NextResponse.json({ error: "Trilha não encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Trail deleted successfully" });
+    return NextResponse.json({ message: "Trilha excluída com sucesso" });
   } catch (error) {
     console.error("Error deleting trail:", error);
     return NextResponse.json(
-      { error: "Failed to delete trail" },
+      { error: "Falha ao excluir trilha" },
       { status: 500 },
     );
   }
