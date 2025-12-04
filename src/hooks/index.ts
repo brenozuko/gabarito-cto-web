@@ -10,6 +10,7 @@ export * from "./queries/trails/useTrailItems";
 export * from "./mutations/items/useCompleteItem";
 export * from "./mutations/items/useCreateItem";
 export * from "./mutations/items/useDeleteItem";
+export * from "./mutations/items/useReorderItems";
 export * from "./mutations/items/useUpdateItem";
 export * from "./mutations/trails/useCreateTrail";
 export * from "./mutations/trails/useDeleteTrail";

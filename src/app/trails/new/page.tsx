@@ -8,29 +8,31 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { InlineTrailFormCreate } from "~/components/forms/InlineTrailFormCreate";
-import { ItemCardEdit } from "~/components/trails/ItemCardEdit";
+import { ItemCardDraft } from "~/components/trails/ItemCardDraft";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import { useCreateItem, useReorderItems, useTrail, useTrailItems } from "~/hooks";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { useCreateTrail } from "~/hooks";
+import { cn } from "~/lib/utils";
 
-interface TrailItem {
-  id: number;
+interface DraftItem {
+  id: string;
   name: string;
-  description: string | null;
   xp: number;
   order: number;
-  completed: boolean;
 }
 
 export default function NewTrailPage() {
-  const [trailId, setTrailId] = useState<number | null>(null);
-  const { data: trail } = useTrail(trailId ?? 0);
-  const { data: trailItems = [] } = useTrailItems(trailId ?? 0);
-  const createItem = useCreateItem();
-  const reorderItems = useReorderItems();
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [isEditingName, setIsEditingName] = useState(true);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [draftItems, setDraftItems] = useState<DraftItem[]>([]);
+  const createTrail = useCreateTrail();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -39,128 +41,233 @@ export default function NewTrailPage() {
     })
   );
 
-  const handleTrailCreated = (id: number) => {
-    setTrailId(id);
-  };
-
   const handleDragEnd = (event: any) => {
-    if (!trailId) return;
-
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const typedItems = trailItems as TrailItem[];
-      const oldIndex = typedItems.findIndex(
+      const oldIndex = draftItems.findIndex(
         (item) => item.id === active.id
       );
-      const newIndex = typedItems.findIndex(
+      const newIndex = draftItems.findIndex(
         (item) => item.id === over.id
       );
 
-      const reorderedItems = arrayMove(typedItems, oldIndex, newIndex) as TrailItem[];
+      const reorderedItems = arrayMove(draftItems, oldIndex, newIndex);
+      const itemsWithNewOrder = reorderedItems.map((item, index) => ({
+        ...item,
+        order: index,
+      }));
 
-      // Atualiza a ordem no backend
-      const itemOrders = reorderedItems.map(
-        (item, index) => ({
-          id: item.id,
-          order: index,
-        })
-      );
-
-      reorderItems.mutate({
-        trailId,
-        itemOrders,
-      });
+      setDraftItems(itemsWithNewOrder);
     }
   };
 
   const handleAddItem = () => {
-    if (!trailId) return;
-
-    const maxOrder = trailItems.length > 0
-      ? Math.max(...trailItems.map((item: { order: number }) => item.order))
+    const maxOrder = draftItems.length > 0
+      ? Math.max(...draftItems.map((item) => item.order))
       : -1;
 
-    createItem.mutate({
-      trailId,
+    const newItem: DraftItem = {
+      id: `draft-${Date.now()}-${Math.random()}`,
       name: "Novo Item",
       xp: 10,
       order: maxOrder + 1,
+    };
+
+    setDraftItems([...draftItems, newItem]);
+  };
+
+  const handleUpdateItem = (id: string, updates: { name?: string; xp?: number }) => {
+    setDraftItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, ...updates } : item
+      )
+    );
+  };
+
+  const handleDeleteItem = (id: string) => {
+    setDraftItems((items) => {
+      const filtered = items.filter((item) => item.id !== id);
+      // Reordenar os itens restantes
+      return filtered.map((item, index) => ({
+        ...item,
+        order: index,
+      }));
     });
+  };
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      alert("Por favor, adicione um nome para a trilha.");
+      return;
+    }
+
+    try {
+      // Criar a trilha com os itens em uma única requisição
+      const result = await createTrail.mutateAsync({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        items: draftItems.length > 0
+          ? draftItems.map((item) => ({
+              name: item.name.trim() || "Novo Item",
+              xp: item.xp,
+              order: item.order,
+            }))
+          : undefined,
+      });
+
+      // Redirecionar para a página da trilha
+      router.push(`/trails/${result.trail.id}`);
+    } catch (error) {
+      console.error("Error saving trail:", error);
+      alert("Falha ao salvar trilha. Por favor, tente novamente.");
+    }
+  };
+
+  const handleCancel = () => {
+    router.push("/");
   };
 
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link
-            href="/"
-            className="text-primary hover:text-primary/80 hover:underline"
-          >
-            ← Voltar para Trilhas
-          </Link>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">Nova Trilha</h1>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={createTrail.isPending || !name.trim()}
+            >
+              {createTrail.isPending ? "Salvando..." : "Salvar"}
+            </Button>
+          </div>
         </div>
 
         <Card className="mb-8">
           <CardContent className="p-6">
-            <InlineTrailFormCreate
-              onTrailCreated={handleTrailCreated}
-              trailId={trailId ?? undefined}
-              initialName={trail?.name}
-              initialDescription={trail?.description}
-            />
+            <div className="space-y-4">
+              <div>
+                {isEditingName ? (
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onBlur={() => setIsEditingName(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.currentTarget.blur();
+                      } else if (e.key === "Escape") {
+                        setName("");
+                        setIsEditingName(false);
+                      }
+                    }}
+                    className="text-3xl font-semibold h-auto py-2"
+                    maxLength={256}
+                    autoFocus
+                    placeholder="Nome da trilha"
+                    disabled={createTrail.isPending}
+                  />
+                ) : (
+                  <h1
+                    className="text-3xl font-semibold cursor-text hover:bg-accent/50 rounded px-2 py-2 -mx-2 transition-colors"
+                    onClick={() => setIsEditingName(true)}
+                  >
+                    {name || "Clique para adicionar um nome"}
+                  </h1>
+                )}
+              </div>
+
+              <div>
+                {isEditingDescription ? (
+                  <Textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    onBlur={() => setIsEditingDescription(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        setDescription("");
+                        setIsEditingDescription(false);
+                      }
+                    }}
+                    className="min-h-[100px] resize-none"
+                    maxLength={1000}
+                    placeholder="Descrição (opcional)"
+                    disabled={createTrail.isPending}
+                  />
+                ) : (
+                  <p
+                    className={cn(
+                      "text-base text-muted-foreground cursor-text hover:bg-accent/50 rounded px-2 py-2 -mx-2 transition-colors",
+                      !description && "text-muted-foreground/50 italic"
+                    )}
+                    onClick={() => setIsEditingDescription(true)}
+                  >
+                    {description || "Clique para adicionar uma descrição"}
+                  </p>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {trailId && (
-          <>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground">Itens</h2>
-              <Button onClick={handleAddItem} disabled={createItem.isPending}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-foreground">Itens</h2>
+        </div>
+
+        {draftItems.length === 0 ? (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Button
+                onClick={handleAddItem}
+                size="lg"
+                className="mx-auto"
+              >
                 <Plus className="h-4 w-4 mr-2" />
-                {createItem.isPending ? "Adicionando..." : "Adicionar Item"}
+                Adicionar Novo Item
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={draftItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  {draftItems.map((item) => (
+                    <ItemCardDraft
+                      key={item.id}
+                      id={item.id}
+                      name={item.name}
+                      xp={item.xp}
+                      order={item.order}
+                      onUpdate={handleUpdateItem}
+                      onDelete={handleDeleteItem}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+            <div className="mt-4 text-center">
+              <Button
+                onClick={handleAddItem}
+                size="lg"
+                className="mx-auto"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Novo Item
               </Button>
             </div>
-
-            {trailItems.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <p className="text-lg text-muted-foreground">
-                    Ainda não há itens. Clique em "Adicionar Item" para começar!
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={trailItems.map((item: { id: number }) => item.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-4">
-                    {trailItems.map(
-                      (item: {
-                        id: number;
-                        name: string;
-                        xp: number;
-                        order: number;
-                      }) => (
-                        <ItemCardEdit
-                          key={item.id}
-                          id={item.id}
-                          name={item.name}
-                          xp={item.xp}
-                          order={item.order}
-                        />
-                      )
-                    )}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            )}
           </>
         )}
       </div>

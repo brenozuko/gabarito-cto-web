@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { ProgressBar } from "~/components/ProgressBar";
-import { ItemCard } from "~/components/trails/ItemCard";
+import { ItemCardView } from "~/components/trails/ItemCardView";
 import { ButtonLink } from "~/components/ui/button-link";
 import {
   Card,
@@ -74,7 +74,7 @@ export default function TrailDetailPage() {
               </div>
               <CardAction>
                 <ButtonLink href={`/trails/${trail.id}/edit`} variant="outline">
-                  Editar
+                  Editar Trilha
                 </ButtonLink>
               </CardAction>
             </div>
@@ -92,11 +92,8 @@ export default function TrailDetailPage() {
           </CardContent>
         </Card>
 
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6">
           <h2 className="text-2xl font-bold text-foreground">Itens</h2>
-          <ButtonLink href={`/trails/${trail.id}/items/new`}>
-            Adicionar Item
-          </ButtonLink>
         </div>
 
         {trailItems.length === 0 ? (
@@ -117,14 +114,12 @@ export default function TrailDetailPage() {
                 xp: number;
                 completed: boolean;
               }) => (
-                <ItemCard
+                <ItemCardView
                   key={item.id}
                   id={item.id}
                   name={item.name}
-                  description={item.description}
                   xp={item.xp}
                   completed={item.completed}
-                  trailId={trail.id}
                 />
               )
             )}

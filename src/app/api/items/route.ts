@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       .values({
         trailId: validatedData.trailId,
         name: validatedData.name,
-        description: validatedData.description ?? null,
         xp: validatedData.xp ?? 10,
         order: validatedData.order ?? 0,
       })

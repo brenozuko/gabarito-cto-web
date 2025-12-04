@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const trailKeys = {
+  items: (id: number) => ["trails", "detail", id, "items"],
   all: ["trails"],
 };
 
@@ -18,10 +19,12 @@ export function useDeleteItem() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Falha ao excluir item");
-      return res.json();
+      const deletedItem = await res.json();
+      return deletedItem;
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: trailKeys.items(result.trailId) }),
         queryClient.invalidateQueries({ queryKey: trailKeys.all }),
         queryClient.invalidateQueries({ queryKey: statsKeys.all }),
       ]);

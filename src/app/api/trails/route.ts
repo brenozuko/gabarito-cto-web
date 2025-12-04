@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createTrailSchema } from "~/server/api/schemas";
 import { db } from "~/server/db";
-import { trails } from "~/server/db/schema";
+import { items, trails } from "~/server/db/schema";
 
 export async function GET() {
   try {
@@ -21,15 +21,36 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createTrailSchema.parse(body);
 
-    const [newTrail] = await db
-      .insert(trails)
-      .values({
-        name: validatedData.name,
-        description: validatedData.description ?? null,
-      })
-      .returning();
+    const result = await db.transaction(async (tx) => {
+      // Criar a trilha
+      const [newTrail] = await tx
+        .insert(trails)
+        .values({
+          name: validatedData.name,
+          description: validatedData.description ?? null,
+        })
+        .returning();
 
-    return NextResponse.json(newTrail, { status: 201 });
+      // Criar os itens se fornecidos
+      let createdItems: typeof items.$inferSelect[] = [];
+      if (validatedData.items && validatedData.items.length > 0) {
+        createdItems = await tx
+          .insert(items)
+          .values(
+            validatedData.items.map((item) => ({
+              trailId: newTrail?.id ?? 0,
+              name: item.name,
+              xp: item.xp ?? 10,
+              order: item.order ?? 0,
+            }))
+          )
+          .returning();
+      }
+
+      return { trail: newTrail, items: createdItems };
+    });
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(

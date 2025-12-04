@@ -35,7 +35,6 @@ export const items = createTable(
     id: d.integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
     trailId: d.integer({ mode: "number" }).notNull(),
     name: d.text({ length: 256 }).notNull(),
-    description: d.text(),
     xp: d.integer({ mode: "number" }).notNull().default(10),
     completed: d.integer({ mode: "boolean" }).notNull().default(false),
     order: d.integer({ mode: "number" }).notNull().default(0),

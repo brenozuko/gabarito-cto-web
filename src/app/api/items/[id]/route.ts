@@ -4,6 +4,38 @@ import { updateItemSchema } from "~/server/api/schemas";
 import { db } from "~/server/db";
 import { items } from "~/server/db/schema";
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const itemId = Number.parseInt(id, 10);
+
+    if (Number.isNaN(itemId)) {
+      return NextResponse.json({ error: "ID de item inválido" }, { status: 400 });
+    }
+
+    const [item] = await db
+      .select()
+      .from(items)
+      .where(eq(items.id, itemId))
+      .limit(1);
+
+    if (!item) {
+      return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json(item);
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    return NextResponse.json(
+      { error: "Falha ao buscar item" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -21,7 +53,6 @@ export async function PUT(
 
     const updateData: {
       name?: string;
-      description?: string | null;
       xp?: number;
       order?: number;
       updatedAt: Date;
@@ -31,9 +62,6 @@ export async function PUT(
 
     if (validatedData.name !== undefined) {
       updateData.name = validatedData.name;
-    }
-    if (validatedData.description !== undefined) {
-      updateData.description = validatedData.description ?? null;
     }
     if (validatedData.xp !== undefined) {
       updateData.xp = validatedData.xp;
@@ -89,7 +117,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Item não encontrado" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Item excluído com sucesso" });
+    return NextResponse.json(deletedItem);
   } catch (error) {
     console.error("Error deleting item:", error);
     return NextResponse.json(
